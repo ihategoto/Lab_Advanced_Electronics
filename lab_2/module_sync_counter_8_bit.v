@@ -11,19 +11,10 @@ output		carry;
 reg		clk_in_old;
 reg	[7:0]	out;
 reg		carry;
-reg		flag;
-reg 		stop_old;
 
 always @(posedge master_clk) 
 begin
-	if (stop_old == 1 && stop == 0)
-	begin
-		flag <= ~flag;
-	end
-	
-	stop_old <= stop;
-	
-	if (!flag)
+	if (!stop)
 	begin
 		if((!clk_in_old)&&(clk_in))
 		begin

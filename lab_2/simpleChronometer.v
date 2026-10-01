@@ -15,6 +15,7 @@ wire w_carry_100_mHz;
 
 wire [7:0] wb_cents;
 wire [7:0] wb_secs;
+wire stop;
 
 output	[7:0]	LED;
 
@@ -24,9 +25,15 @@ Module_FrequencyDivider clock_100_Hz_generator (
 						.clk_out(w_clock_100_Hz)
 );
 
+Toggle_button toggle_btn (
+	.clk(CLK_125M),
+	.button(BTN_3),
+	.flag(stop)
+);
+
 Module_sync_counter_8_bit counter_100_Hz (
 	.master_clk(CLK_125M),
-	.stop(BTN_3),
+	.stop(stop),
 	.clk_in(w_clock_100_Hz),
 	.limit(8'b00001010),
 	.carry(w_carry_10_Hz),
@@ -35,7 +42,7 @@ Module_sync_counter_8_bit counter_100_Hz (
 
 Module_sync_counter_8_bit counter_10_Hz (
 	.master_clk(CLK_125M),
-	.stop(BTN_3),
+	.stop(stop),
 	.clk_in(w_carry_10_Hz),
 	.limit(8'b00001010),
 	.carry(w_carry_1_Hz),
@@ -44,7 +51,7 @@ Module_sync_counter_8_bit counter_10_Hz (
 
 Module_sync_counter_8_bit counter_1_Hz (
 	.master_clk(CLK_125M),
-	.stop(BTN_3),
+	.stop(stop),
 	.clk_in(w_carry_1_Hz),
 	.limit(8'b00001010),
 	.carry(w_carry_100_mHz),
@@ -53,7 +60,7 @@ Module_sync_counter_8_bit counter_1_Hz (
 
 Module_sync_counter_8_bit counter_100_mHz (
 	.master_clk(CLK_125M),
-	.stop(BTN_3),
+	.stop(stop),
 	.clk_in(w_carry_100_mHz),
 	.limit(8'b00001010),
 	.out(wb_secs[7:4])
