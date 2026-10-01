@@ -1,0 +1,46 @@
+#-----------------------------------------------------------
+# Vivado v2022.1 (64-bit)
+# SW Build 3526262 on Mon Apr 18 15:47:01 MDT 2022
+# IP Build 3524634 on Mon Apr 18 20:55:01 MDT 2022
+# Start of session at: Tue Sep 29 18:41:14 2026
+# Process ID: 63237
+# Current directory: /home/vittoria.dore/Desktop/lab_advanced_electronics/lab_1/progdev
+# Command line: vivado -mode batch -source pipeline.tcl
+# Log file: /home/vittoria.dore/Desktop/lab_advanced_electronics/lab_1/progdev/vivado.log
+# Journal file: /home/vittoria.dore/Desktop/lab_advanced_electronics/lab_1/progdev/vivado.jou
+# Running On: sci-ldpc0-164x.unitn.it, OS: Linux, CPU Frequency: 3800.000 MHz, CPU Physical cores: 10, Host memory: 16445 MB
+#-----------------------------------------------------------
+source pipeline.tcl
+# open_hw_manager
+# connect_hw_server -url localhost:3121
+INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121
+INFO: [Labtools 27-2222] Launching hw_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+****** Xilinx hw_server v2022.1
+  **** Build date : Apr 18 2022 at 16:10:30
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+
+INFO: [Labtools 27-3415] Connecting to cs_server url TCP:localhost:3042
+INFO: [Labtools 27-3417] Launching cs_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+
+******** Xilinx cs_server v2022.1.0
+  ****** Build date   : Apr 12 2022-21:12:08
+    **** Build number : 2022.1.1649790728
+      ** Copyright 2017-2026 Xilinx, Inc. All Rights Reserved.
+
+
+
+# current_hw_target [get_hw_targets */xilinx_tcf/Digilent/*]
+# open_hw_target
+INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210351AF2502A
+# current_hw_device [lindex [get_hw_devices] 1]
+# refresh_hw_device -update_hw_probes false [lindex [get_hw_devices] 1]
+INFO: [Labtools 27-1434] Device xc7z010 (JTAG device index = 1) is programmed with a design that has no supported debug core(s) in it.
+# set_property PROGRAM.FILE "simpleCounter.bit" [lindex [get_hw_devices] 1]
+# program_hw_devices [lindex [get_hw_devices] 1]
+INFO: [Labtools 27-3164] End of startup status: HIGH
+INFO: [Common 17-206] Exiting Vivado at Tue Sep 29 18:41:28 2026...

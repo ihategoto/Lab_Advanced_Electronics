@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Vivado v2022.1 (64-bit)
+# SW Build 3526262 on Mon Apr 18 15:47:01 MDT 2022
+# IP Build 3524634 on Mon Apr 18 20:55:01 MDT 2022
+# Start of session at: Tue Sep 29 18:41:14 2026
+# Process ID: 63237
+# Current directory: /home/vittoria.dore/Desktop/lab_advanced_electronics/lab_1/progdev
+# Command line: vivado -mode batch -source pipeline.tcl
+# Log file: /home/vittoria.dore/Desktop/lab_advanced_electronics/lab_1/progdev/vivado.log
+# Journal file: /home/vittoria.dore/Desktop/lab_advanced_electronics/lab_1/progdev/vivado.jou
+# Running On: sci-ldpc0-164x.unitn.it, OS: Linux, CPU Frequency: 3800.000 MHz, CPU Physical cores: 10, Host memory: 16445 MB
+#-----------------------------------------------------------
+source pipeline.tcl
