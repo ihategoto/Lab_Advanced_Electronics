@@ -1,2 +1,3 @@
 *.log
 progdev/
+.DS_store
