@@ -1,3 +1,4 @@
 *.log
+*.bit
 progdev/
 .DS_store
