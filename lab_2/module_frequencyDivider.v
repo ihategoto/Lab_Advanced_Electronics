@@ -1,8 +1,13 @@
 module	Module_FrequencyDivider	(clk_in, half_period, clk_out);
+/*
+Frequency divider, only even dividends are possible:
+	target_freq = clk_freq / div;
+	half_period = div / 2;
+*/
 
-
+// input clock
 input	clk_in; 
-input	[29:0]	half_period; // 30 bit input
+input	[29:0]	half_period;
 
 // output clock
 output reg clk_out; 
@@ -13,25 +18,24 @@ reg	[29:0]	counter;
 always @(posedge clk_in) 
 begin
 	/*
-	Example: frequency divider 4Hz -> 1Hz => half_period = 3
+	Example: frequency divider 4Hz -> 1Hz => half_period = 4/2 = 2
 
-							1s
-	<----------------------------------------------------->
+										1s
+	<----------------------------------------------------------------------->
 
-	+--------+		  +--------+        +--------+        +
-	|		 |	      |  	   |        | 		 |        |
-	|	     |        |		   |		|        |        |	    4Hz    
-	+        +--------+		   +--------+        +--------+
-	^                 ^				    ^				  ^
-	|				  |					|				  |
-	counter -> 0	  counter -> 1		counter -> 2      counter -> 0
-	clk_out -> 1	  clk_out -> 1		clk_out -> 1	  clk_out -> 0
+	+--------+		  +--------+        +--------+        +--------+	    +
+	|		 |	      |  	   |        | 		 |        |		   |	    |
+	|	     |        |		   |		|        |        |	       |        |		4Hz
+	+        +--------+		   +--------+        +--------+		   +--------+
+	^                 ^				    ^				  ^					^
+	|				  |					|				  |					|
+	counter -> 0	  counter -> 1		counter -> 0      counter -> 1		counter -> 0    
+	clk_out -> 1	  clk_out -> 1		clk_out -> 0	  clk_out -> 0		clk_out -> 1
 
-	+-----------------------------------------------------+		  
-	|		 	     									  |    
-	|	             									  |	    1Hz
-	+				 									  +
-
+	+-----------------------------------+		  				  			+
+	|		 	     		   			|						  			|    
+	|	             		  			|						  			|	    1Hz
+	+				 		   			+-----------------------------------+
 	*/
 	if (counter >= (half_period - 1)) begin
 		counter <= 0;
