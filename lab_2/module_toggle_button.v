@@ -1,7 +1,13 @@
-module Toggle_button (clk, button, flag);
+module Module_Toggle_Button (clk, button, flag);
+/*
+Sequential toggle button, it suffers from bouncing effects 
+*/
 
+// input clock
 input clk;
+// button
 input button;
+
 
 output reg flag;
 reg old_button;
