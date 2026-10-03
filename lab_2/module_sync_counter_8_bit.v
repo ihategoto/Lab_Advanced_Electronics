@@ -34,15 +34,18 @@ begin
 			begin
 				out <= 0;
 				carry <= 1;
-			end else if (out == 0) 
+			end 
+			else if (out == 0) 
 			begin
 				out <= 1;
 				carry <= 0;
-			end else
+			end 
+			else
 				out <= out + 1;
-		end
 		clk_in_old <= clk_in;
-	end else
+		end 
+	end 
+	else
 		/*
 		otherwise the output is unchanged
 		*/
