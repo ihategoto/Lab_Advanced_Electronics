@@ -1,6 +1,6 @@
-module	Module_SyncCounter_8_bit(master_clk, clk_in, stop, limit, out, carry);
+module	Module_SyncCounter_8_bit(master_clk, clk_in, stop, reverse, limit, out, carry);
 /*
-Synchronous 8 bit stoppable counter with settable limit.
+Synchronous 8 bit reversable & stoppable counter with settable limit.
 */
 
 // master clock
@@ -11,6 +11,8 @@ input	clk_in;
 input [7:0]	limit;
 // stop flag
 input stop;
+// reverse flag
+input reverse;
 
 // output counter
 output reg [7:0] out;
@@ -30,19 +32,36 @@ begin
 		edge and it's high in the current one than count
 		*/
 		begin
-			if (out >= (limit - 8'b00000001)) 
+			if (!reverse)
 			begin
-				out <= 0;
-				carry <= 1;
-			end 
-			else if (out == 0) 
-			begin
-				out <= 1;
-				carry <= 0;
-			end 
+				if (out >= (limit - 8'b00000001)) 
+				begin
+					out <= 0;
+					carry <= 1;
+				end 
+				else if (out == 0) 
+				begin
+					out <= 1;
+					carry <= 0;
+				end 
+				else
+					out <= out + 1;
+			end
 			else
-				out <= out + 1;
-		clk_in_old <= clk_in;
+			begin
+				if (out == 0) 
+				begin
+					out <= limit - 8'b00000001;
+					carry <= 1;
+				end 
+				else if (out == limit - 8'b00000001) 
+				begin
+					out <= out - 1;
+					carry <= 0;
+				end 
+				else
+					out <= out - 1;
+			end
 		end 
 	end 
 	else
@@ -50,6 +69,7 @@ begin
 		otherwise the output is unchanged
 		*/
 		out <= out;
+	clk_in_old <= clk_in;
 end
 
 endmodule
