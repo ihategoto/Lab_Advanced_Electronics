@@ -1,11 +1,13 @@
 // 125x10^6 / (1.25x10^6) = 100 (Hz) -> halfPeriod = 1.25x10^6 / 2 = 625000
 `define	halfPeriod_100_Hz	30'd625000
 
-module simpleChronometer(CLK_125M, SW, BTN_3, LED);
+module simpleChronometer(CLK_125M, SW, BTN_2, BTN_3, LED);
 // master clock
 input CLK_125M;
 // digit switch
 input SW;
+// reverse button
+input BTN_2;
 // stop button
 input BTN_3;
 

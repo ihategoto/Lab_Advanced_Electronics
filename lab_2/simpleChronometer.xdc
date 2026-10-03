@@ -15,4 +15,5 @@ set_property -dict { PACKAGE_PIN Y17 IOSTANDARD LVCMOS33 } [get_ports { LED[7] }
 set_property -dict { PACKAGE_PIN G15 IOSTANDARD LVCMOS33 } [get_ports { SW }];
 
 # Buttons
+set_property -dict { PACKAGE_PIN K19 IOSTANDARD LVCMOS33 } [get_ports { BTN_2 }];
 set_property -dict { PACKAGE_PIN Y16 IOSTANDARD LVCMOS33 } [get_ports { BTN_3 }];
