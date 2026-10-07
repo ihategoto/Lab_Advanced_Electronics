@@ -1,7 +1,6 @@
 `define		period_1_kHz	30'd62500
 
 module FSM_Core(clk, ss, lr, state, reset);
-
 input		clk;
 input		ss;
 input		lr;
@@ -9,9 +8,15 @@ input		lr;
 output reg	[2:0]	state;
 output reg			reset;
 
+reg			ssOld;
+reg			lrOld;
+
 always @(posedge clk) 
 begin
-	if (ss)
+	lrOld <= lr;
+	ssOld <= ss;
+
+	if (ss && !ssOld)
 	begin
 		case(state)
 			3'b000:
@@ -25,32 +30,28 @@ begin
 			3'b100:
 				state <= 3'b011;
 		endcase
-	end
-	else if (lr)
-	begin
+	end	else if (lr && !lrOld) begin
 		case(state)
 			3'b000:
 				state <= 3'b000;
 			3'b001:
+			begin
 				state <= 3'b000;
-				reset <= 1;
+				reset <= 1'b1;
+			end
 			3'b010:
 				state <= 3'b011;
 			3'b011:
 				state <= 3'b010;
 			3'b100:
-				state <= 3'001;
+				state <= 3'b001;
 		endcase
 	end
 end
-
-
-
 endmodule
 
 
 module Module_StateToLED(clk,state,LED);
-
 input            clk;
 input    [2:0]   state;
 
