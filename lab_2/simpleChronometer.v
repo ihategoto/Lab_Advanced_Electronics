@@ -22,6 +22,8 @@ wire [7:0] wb_cents;
 wire [7:0] wb_secs;
 // stop wire
 wire stop;
+// reverse wire
+wire reverse;
 
 // output LED
 output	[7:0]	LED;
@@ -40,12 +42,19 @@ Module_Toggle_Button toggle_btn (
 	.flag(stop)
 );
 
+Module_Toggle_Button toggle_btn_2(
+	.clk(CLK_125M),
+	.button(BTN_2),
+	.flag(reverse)
+);
+
 // cents counter
 Module_SyncCounter_8_bit counter_100_Hz (
 	.master_clk(CLK_125M),
 	.stop(stop),
 	.clk_in(w_clock_100_Hz),
 	.limit(8'b00001010),
+	.reverse(reverse),
 	.carry(w_carry_10_Hz),
 	.out(wb_cents[3:0])
 );
@@ -56,6 +65,7 @@ Module_SyncCounter_8_bit counter_10_Hz (
 	.stop(stop),
 	.clk_in(w_carry_10_Hz),
 	.limit(8'b00001010),
+	.reverse(reverse),
 	.carry(w_carry_1_Hz),
 	.out(wb_cents[7:4])
 );
@@ -66,6 +76,7 @@ Module_SyncCounter_8_bit counter_1_Hz (
 	.stop(stop),
 	.clk_in(w_carry_1_Hz),
 	.limit(8'b00001010),
+	.reverse(reverse),
 	.carry(w_carry_100_mHz),
 	.out(wb_secs[3:0])
 );
@@ -75,6 +86,7 @@ Module_SyncCounter_8_bit counter_100_mHz (
 	.master_clk(CLK_125M),
 	.stop(stop),
 	.clk_in(w_carry_100_mHz),
+	.reverse(reverse),
 	.limit(8'b00001010),
 	.out(wb_secs[7:4])
 );
