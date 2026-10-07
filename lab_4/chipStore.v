@@ -1,22 +1,45 @@
 /*******************************/
 /*** Module_FrequencyDivider ***/
 /*******************************/
+module	Module_FrequencyDivider	(clk_in, half_period, clk_out);
+/*
+Frequency divider, only even dividends are possible:
+	target_freq = clk_freq / div;
+	half_period = div / 2;
+*/
 
-module	Module_FrequencyDivider	(	clk_in,
-					half_period,
-
-					clk_out);
-
-input		clk_in;
+// input clock
+input	clk_in; 
 input	[29:0]	half_period;
 
-output		clk_out;
+// output clock
+output reg clk_out; 
 
-reg		clk_out;
-
+// 30 bit bus used for counting the input clock positive edges
 reg	[29:0]	counter;
 
-always @(posedge clk_in) begin
+always @(posedge clk_in) 
+begin
+	/*
+	Example: frequency divider 4Hz -> 1Hz => half_period = 4/2 = 2
+
+										1s
+	<----------------------------------------------------------------------->
+
+	+--------+		  +--------+        +--------+        +--------+	    +
+	|		 |	      |  	   |        | 		 |        |		   |	    |
+	|	     |        |		   |		|        |        |	       |        |		4Hz
+	+        +--------+		   +--------+        +--------+		   +--------+
+	^                 ^				    ^				  ^					^
+	|				  |					|				  |					|
+	counter -> 0	  counter -> 1		counter -> 0      counter -> 1		counter -> 0    
+	clk_out -> 1	  clk_out -> 1		clk_out -> 0	  clk_out -> 0		clk_out -> 1
+
+	+-----------------------------------+		  				  			+
+	|		 	     		   			|						  			|    
+	|	             		  			|						  			|	    1Hz
+	+				 		   			+-----------------------------------+
+	*/
 	if (counter >= (half_period - 1)) begin
 		counter <= 0;
 		clk_out <= ~clk_out;
@@ -26,34 +49,84 @@ end
 
 endmodule
 
+endmodule
+
 /****************************/
 /*** Module_Counter_8_bit ***/
 /****************************/
 
-module	Module_Counter_8_bit	(	clk_in,
-					limit,
+module	Module_SyncCounter_8_bit(master_clk, clk_in, stop, reverse, limit, out, carry);
+/*
+Synchronous 8 bit reversable & stoppable counter with settable limit.
+*/
 
-					out,
-					carry);
+// master clock
+input 	master_clk;
+// secondary clock giving the counter frequency
+input	clk_in;
+// upper limit of the counter
+input [7:0]	limit;
+// stop flag
+input stop;
+// reverse flag
+input reverse;
 
-input		clk_in;
-input	[7:0]	limit;
+// output counter
+output reg [7:0] out;
+// carry when the counter reach the limit
+output reg carry;
 
-output	[7:0]	out;
-output		carry;
+// state variable of the secondary clock
+reg	clk_in_old;
 
-reg	[7:0]	out;
-reg		carry;
-
-always @(posedge clk_in) begin
-	if (out >= (limit - 8'b00000001)) begin
-		out <= 0;
-		carry <= 1;
-	end else if (out == 0) begin
-		out <= 1;
-		carry <= 0;
-	end else
-		out <= out + 1;
+always @(posedge master_clk) 
+begin
+	if (!stop)
+	begin
+		if((!clk_in_old) && (clk_in))
+		/*
+		if the secondary clock was low in the previous master clock's 
+		edge and it's high in the current one than count
+		*/
+		begin
+			if (!reverse)
+			begin
+				if (out >= (limit - 8'b00000001)) 
+				begin
+					out <= 0;
+					carry <= 1;
+				end 
+				else if (out == 0) 
+				begin
+					out <= 1;
+					carry <= 0;
+				end 
+				else
+					out <= out + 1;
+			end
+			else
+			begin
+				if (out == 0) 
+				begin
+					out <= limit - 8'b00000001;
+					carry <= 1;
+				end 
+				else if (out == limit - 8'b00000001) 
+				begin
+					out <= out - 1;
+					carry <= 0;
+				end 
+				else
+					out <= out - 1;
+			end
+		end 
+	end 
+	else
+		/*
+		otherwise the output is unchanged
+		*/
+		out <= out;
+	clk_in_old <= clk_in;
 end
 
 endmodule
@@ -115,24 +188,27 @@ endmodule
 /*** Module_Multiplexer_2_input_8_bit_sync ***/
 /*********************************************/
 
-module	Module_Multiplexer_2_input_8_bit_sync	(	clk_in,
-							address,
-							input_0,
-							input_1,
+module	Module_Multiplexer_16_8_bit (clk, addr, input_1, input_2, out);
+/*
+Multiplexer of two channels of 8 bit each, one bit address is needed.
+*/
 
-							mux_output);
+// input clock
+input clk;
+// address bit
+input addr;
+// channels
+input [7:0] input_1;
+input [7:0] input_2;
 
-input		clk_in;
-input		address;
-input	[7:0]	input_0;
-input	[7:0]	input_1;
+// output channel
+output reg [7:0] out;
 
-output	[7:0]	mux_output;
-
-reg	[7:0]	mux_output;
-
-always @(posedge clk_in) begin
-	mux_output <= (address)? input_1 : input_0;
+always @(posedge clk) begin
+	if (addr)  
+		out <= input_1;
+	else
+		out <= input_2;
 end
 
 endmodule
@@ -142,62 +218,39 @@ endmodule
 /*****************************/
 
 `define		defaultN 	28'b0000001001100010010110100000	//	2.5 x 10^6 ===> 20 ms
+module Module_MonostableMultivibrator(clk, duration, button, flag);
+/*
+Toggle button that does not suffer from bounces.
+*/
 
-module Module_Monostable	(	clk_in,
-					monostable_input,
-					N,
+// clock
+input clk;
+// number of edges to mantain the flag high
+input [29:0] duration;
+// input button
+input button;
 
-					monostable_output);
+// output flag
+output reg flag;
 
-input		clk_in;
-input		monostable_input;
-input	[27:0]	N;
+// state of the button on the previous edge
+reg old_button;
+// counter of edges
+reg [29:0] counter;
 
-output		monostable_output;
+always @(posedge clk)
+begin
+    if (old_button == 0 && button == 1)
+            flag <= 1;
+    else if (counter == duration)
+        begin
+            flag <= 0;
+            counter <= 0;
+        end
+    else if (flag) // maybe here is better to have an if instead of an else if
+            counter <= counter + 1;
 
-reg		monostable_output;
-
-reg		monostable_input_old;
-reg 	[27:0]	counter;
-
-always @(posedge clk_in) begin
-	if (counter == 0) begin
-		if (!monostable_input_old & monostable_input) begin
-			counter <= ((N)? N : `defaultN) - 1;
-			monostable_output <= 1;
-		end else
-			monostable_output <= 0;
-	end else
-		counter <= counter - 1;
-
-	monostable_input_old <= monostable_input;
-end
-
-endmodule
-
-/**********************************/
-/*** Module_ToggleFlipFlop_sync ***/
-/**********************************/
-
-module Module_ToggleFlipFlop	(	clk_in,
-					ff_input,
-
-					ff_output);
-
-input		clk_in;
-input		ff_input;
-
-output		ff_output;
-
-reg		ff_output;
-
-reg		ff_input_previous;
-
-always @(posedge clk_in) begin
-	if (!ff_input_previous & ff_input)
-		ff_output <= ~ff_output;
-
-	ff_input_previous <= ff_input;
+    old_button <= button;
 end
 
 endmodule
