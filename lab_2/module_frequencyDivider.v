@@ -13,7 +13,7 @@ input	[29:0]	half_period;
 output reg clk_out; 
 
 // 30 bit bus used for counting the input clock positive edges
-reg	[29:0]	counter;
+reg	[29:0]	counter_2;
 
 always @(posedge clk_in) 
 begin
