@@ -1,18 +1,13 @@
-module Module_Latch_8_bit(clk, in, out, button);
+module Module_Latch_8_bit(clk, in, out, flag);
 input clk;
 input [7:0] in;
-input button;
+input flag;
 
-reg old_button;
-reg flag;
 output reg [7:0] out;
 
 always @(posedge clk)
 begin
-    old_button <= button;
-    if(!old_button && button)
-        flag <= ~flag;
-    else if(!flag)
+    if(!flag)
         out <= in;
 
 end
