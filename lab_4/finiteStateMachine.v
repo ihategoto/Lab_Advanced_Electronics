@@ -109,7 +109,7 @@ Module_Latch_8_bit latch(
 	.clk(CLK_125M),
 	.in(wb_latch),
 	.out(LED),
-	.button(wb_state == 3'd3 || wb_state == 3'd4)
+	.flag(wb_state == 3'd3 || wb_state == 3'd4)
 );
 
 
