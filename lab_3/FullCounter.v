@@ -2,7 +2,7 @@
 `define duration 30'd62500
 `define	halfPeriod_100_Hz	30'd625000
 
-module FullCounter(CLK_125M, STOP, REVERSE, LAP, RESET, LED);
+module FullCounter(CLK_125M, STOP, REVERSE, LAP, RESET, SW, LED);
 // master clock
 input CLK_125M;
 // buttons 
@@ -10,6 +10,7 @@ input STOP;
 input REVERSE;
 input LAP;
 input RESET;
+input SW;
 
 // wires for buttons
 wire w_stop;
