@@ -42,6 +42,7 @@ begin
 			end 
 			else
 				out <= out + 1;
+		end
 	end 
 	else
 		/*
