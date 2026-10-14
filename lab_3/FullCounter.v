@@ -73,7 +73,7 @@ Module_SyncCounter_Advanced_8_bit counter_100_Hz(
 	.reset(w_reset),
 	.limit(4'd10),
 	.out(wb_cents[3:0]),
-	.carry(w_clock_10_Hz),
+	.carry(w_clock_10_Hz)
 );
 
 Module_SyncCounter_Advanced_8_bit counter_10_Hz(
@@ -84,7 +84,7 @@ Module_SyncCounter_Advanced_8_bit counter_10_Hz(
 	.reset(w_reset),
 	.limit(4'd10),
 	.out(wb_cents[7:4]),
-	.carry(w_clock_1_Hz),
+	.carry(w_clock_1_Hz)
 );
 
 Module_SyncCounter_Advanced_8_bit counter_1_Hz(
@@ -95,7 +95,7 @@ Module_SyncCounter_Advanced_8_bit counter_1_Hz(
 	.reset(w_reset),
 	.limit(4'd10),
 	.out(wb_secs[3:0]),
-	.carry(w_clock_100_mHz),
+	.carry(w_clock_100_mHz)
 );
 
 Module_SyncCounter_Advanced_8_bit counter_100_mHz(
