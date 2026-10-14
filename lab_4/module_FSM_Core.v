@@ -20,31 +20,58 @@ begin
 	begin
 		case(state)
 			3'b000:
+			begin
 				state <= 3'b010;
+				reset <= 1'b0;
+			end
 			3'b001:
+			begin
 				state <= 3'b010;
+				reset <= 1'b0;
+			end
 			3'b010:
+			begin
 				state <= 3'b001;
+				reset <= 1'b0;
+			end
 			3'b011:
+			begin
 				state <= 3'b100;
+				reset <= 1'b0;
+			end
 			3'b100:
+			begin
 				state <= 3'b011;
+				reset <= 1'b0;
+			end
 		endcase
 	end	else if (lr && !lrOld) begin
 		case(state)
 			3'b000:
+			begin
 				state <= 3'b000;
+				reset <= 1'b0;
+			end
 			3'b001:
 			begin
 				state <= 3'b000;
 				reset <= 1'b1;
 			end
 			3'b010:
+			begin
 				state <= 3'b011;
+				reset <= 1'b0;
+			end
 			3'b011:
+			begin
 				state <= 3'b010;
+				reset <= 1'b0;
+			end
 			3'b100:
+			begin
 				state <= 3'b001;
+				reset <= 1'b0;
+			end
 		endcase
 	end
 end
