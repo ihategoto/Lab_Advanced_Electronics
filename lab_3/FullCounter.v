@@ -1,5 +1,6 @@
 // number of edges of the master clock the LED must be on for
 `define duration 30'd62500
+`define	halfPeriod_100_Hz	30'd625000
 
 module FullCounter(CLK_125M, STOP, REVERSE, LAP, RESET, LED);
 // master clock
