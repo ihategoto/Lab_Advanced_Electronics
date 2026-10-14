@@ -5,6 +5,7 @@
 module FullCounter(CLK_125M, STOP, REVERSE, LAP, RESET, SW, LED);
 // master clock
 input CLK_125M;
+
 // buttons 
 input STOP;
 input REVERSE;
@@ -27,6 +28,9 @@ wire w_carry_100_mHz;
 // bitstring representing cents and secs
 wire [7:0] wb_cents;
 wire [7:0] wb_secs;
+
+// wire for counter to latch
+wire [7:0] wb_latch;
 
 // output LED
 output [7:0] LED;
@@ -115,7 +119,15 @@ Module_Multiplexer_16_8_bit multiplexer (
 	.addr(SW),
 	.input_1(wb_secs),
 	.input_2(wb_cents),
-	.out(LED)
+	.out(wb_latch)
 );
+
+Module_Latch_8_bit latch(
+	.clk(CLK_125M),
+	.in(wb_latch),
+	.out(LED),
+	.button(w_lap)
+);
+
 
 endmodule
