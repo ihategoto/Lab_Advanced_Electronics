@@ -59,7 +59,7 @@ FSM_Core fsm(
 
 Module_SyncCounter_State_8_bit counter_100_Hz(
 	.master_clk(CLK_125M),
-	.clk(w_clock_100_Hz),
+	.clk_in(w_clock_100_Hz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -69,7 +69,7 @@ Module_SyncCounter_State_8_bit counter_100_Hz(
 
 Module_SyncCounter_State_8_bit counter_10_Hz(
 	.master_clk(CLK_125M),
-	.clk(w_carry_10_Hz),
+	.clk_in(w_carry_10_Hz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -79,7 +79,7 @@ Module_SyncCounter_State_8_bit counter_10_Hz(
 
 Module_SyncCounter_State_8_bit counter_1_Hz(
 	.master_clk(CLK_125M),
-	.clk(w_carry_1_Hz),
+	.clk_in(w_carry_1_Hz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -89,7 +89,7 @@ Module_SyncCounter_State_8_bit counter_1_Hz(
 
 Module_SyncCounter_State_8_bit counter_100_mHz(
 	.master_clk(CLK_125M),
-	.clk(w_carry_100_mHz),
+	.clk_in(w_carry_100_mHz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
