@@ -22,8 +22,11 @@ output reg carry;
 // state variable of the secondary clock
 reg	clk_in_old;
 
+reg reset_old;
+
 always @(posedge master_clk) 
 begin
+	reset_old <= reset;
 	if(!reset_old && reset)
 		out <= 0;
 	else if (!stop)
