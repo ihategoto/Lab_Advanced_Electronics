@@ -1,4 +1,5 @@
 module Module_Latch_8_bit(clk, in, out, button);
+input clk;
 input [7:0] in;
 input button;
 
