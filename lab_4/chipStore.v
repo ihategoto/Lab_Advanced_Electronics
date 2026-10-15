@@ -49,13 +49,13 @@ end
 
 endmodule
 
-/****************************/
-/*** Module_Counter_8_bit ***/
-/****************************/
+/**************************************/
+/*** Module_SyncCounter_State_8_bit ***/
+/**************************************/
 
-module	Module_SyncCounter_8_bit(master_clk, clk_in, stop, reverse, limit, out, carry);
+module	Module_SyncCounter_State_8_bit(master_clk, clk_in, stop, reset, limit, out, carry);
 /*
-Synchronous 8 bit reversable & stoppable counter with settable limit.
+Synchronous 8 bit stoppable & reversable counter with settable limit.
 */
 
 // master clock
@@ -66,8 +66,8 @@ input	clk_in;
 input [7:0]	limit;
 // stop flag
 input stop;
-// reverse flag
-input reverse;
+// reset flag
+input reset;
 
 // output counter
 output reg [7:0] out;
@@ -77,51 +77,34 @@ output reg carry;
 // state variable of the secondary clock
 reg	clk_in_old;
 
+reg reset_old;
+
 always @(posedge master_clk) 
 begin
-	if (!stop)
+	reset_old <= reset;
+	if(!reset_old && reset)
+		out <= 0;
+	else if (!stop)
 	begin
 		if((!clk_in_old) && (clk_in))
-		/*
-		if the secondary clock was low in the previous master clock's 
-		edge and it's high in the current one than count
-		*/
 		begin
-			if (!reverse)
+			if (out >= (limit - 8'b00000001)) 
 			begin
-				if (out >= (limit - 8'b00000001)) 
-				begin
-					out <= 0;
-					carry <= 1;
-				end 
-				else if (out == 0) 
-				begin
-					out <= 1;
-					carry <= 0;
-				end 
-				else
-					out <= out + 1;
-			end
+				out <= 0;
+				carry <= 1;
+			end 
+			else if (out == 0) 
+			begin
+				out <= 1;
+				carry <= 0;
+			end 
 			else
-			begin
-				if (out == 0) 
-				begin
-					out <= limit - 8'b00000001;
-					carry <= 1;
-				end 
-				else if (out == limit - 8'b00000001) 
-				begin
-					out <= out - 1;
-					carry <= 0;
-				end 
-				else
-					out <= out - 1;
-			end
-		end 
+				out <= out + 1;
+		end
 	end 
 	else
 		/*
-		otherwise the output is unchanged
+		otherwise the output is unchanged (not necessary)
 		*/
 		out <= out;
 	clk_in_old <= clk_in;
@@ -129,62 +112,9 @@ end
 
 endmodule
 
-/**************************************/
-/*** Module_SynchroCounter_8_bit_SR ***/
-/**************************************/
-
-module	Module_SynchroCounter_8_bit_SR	(	qzt_clk,
-						clk_in,
-						reset,
-						set,
-						presetValue,
-						limit,
-
-						out,
-						carry);
-
-input		qzt_clk;
-input		clk_in;
-input		reset;
-input		set;
-input	[7:0]	presetValue;
-input	[7:0]	limit;
-
-output	[7:0]	out;
-output		carry;
-
-reg	[7:0]	out;
-reg		carry;
-
-reg		clk_in_old;
-
-
-always @(posedge qzt_clk) begin
-	if (reset) begin
-		out <= 0;
-		carry <= 0;
-	end else if (set) begin
-		out <= presetValue;
-		carry <= 0;
-	end else if (!clk_in_old & clk_in) begin
-		if (out >= (limit - 8'b00000001)) begin
-			out <= 0;
-			carry <= 1;
-		end else if (out == 0) begin
-			out <= 1;
-			carry <= 0;
-		end else
-			out <= out + 1;
-	end
-
-	clk_in_old <= clk_in;
-end
-
-endmodule
-
-/*********************************************/
-/*** Module_Multiplexer_2_input_8_bit_sync ***/
-/*********************************************/
+/***********************************/
+/*** Module_Multiplexer_16_8_bit ***/
+/***********************************/
 
 module	Module_Multiplexer_16_8_bit (clk, addr, input_1, input_2, out);
 /*
@@ -211,14 +141,14 @@ end
 
 endmodule
 
-/*****************************/
-/*** Module_MonostableHold ***/
-/*****************************/
+/**************************************/
+/*** Module_MonostableMultivibrator ***/
+/**************************************/
 
-`define		defaultN 	28'b0000001001100010010110100000	//	2.5 x 10^6 ===> 20 ms
 module Module_MonostableMultivibrator(clk, duration, button, flag);
 /*
-Toggle button that does not suffer from bounces.
+Toggle button that does not suffer from bounces. 
+It returns the button signal that is kept up for `duration` clock edges.
 */
 
 // clock
@@ -245,10 +175,71 @@ begin
             flag <= 0;
             counter <= 0;
         end
-    else if (flag) // maybe here is better to have an if instead of an else if
+    else if (flag) 
             counter <= counter + 1;
 
     old_button <= button;
+end
+
+endmodule
+
+/*******************************************/
+/*** Module_StateMonostableMultivibrator ***/
+/*******************************************/
+
+module Module_StateMonostableMultivibrator(clk, duration, button, flag);
+/*
+Toggle button that does not suffer from bounces. 
+It protects the button from bounces and exposes a single bit state variable that is
+changed upon pressing the button. 
+*/
+
+// clock
+input clk;
+// number of edges to mantain the flag high
+input [29:0] duration;
+// input button
+input button;
+
+// output flag
+output reg flag;
+
+// state of the button on the previous edge
+reg old_button;
+// counter of edges
+reg [29:0] counter;
+
+always @(posedge clk)
+begin
+    if (old_button == 0 && button == 1 && counter == 0)
+            flag <= ~flag;
+            counter <= 1;
+    else if (counter == duration)
+            counter <= 0;
+    else if (counter > 0) // maybe here is better to have an if instead of an else if
+            counter <= counter + 1;
+    old_button <= button;
+end
+
+endmodule
+
+/**************************/
+/*** Module_Latch_8_bit ***/
+/**************************/
+
+module Module_Latch_8_bit(clk, in, out, flag);
+
+input clk;
+input [7:0] in;
+input flag;
+
+output reg [7:0] out;
+
+always @(posedge clk)
+begin
+    if(!flag)
+        out <= in;
+
 end
 
 endmodule
@@ -257,25 +248,135 @@ endmodule
 /*** Module_Latch_16_bit ***/
 /***************************/
 
-module	Module_Latch_16_bit	(	clk_in,
-					holdFlag,
-					twoByteInput,
+module	Module_Latch_16_bit(clk, in, out, flag);
 
-					twoByteOuput);
+input clk;
+input [15:0] in;
+input flag;
 
-input		clk_in;
-input		holdFlag;
-input	[15:0]	twoByteInput;
+output reg [15:0] out;
 
-output	[15:0]	twoByteOuput;
+always @(posedge clk)
+begin
+    if(!flag)
+        out <= in;
 
-reg	[15:0]	twoByteOuput;
-
-
-always @(posedge clk_in) begin
-	if (!holdFlag) twoByteOuput <= twoByteInput;
 end
 
+endmodule
+
+/***********************/
+/*** Module_FSM_Core ***/
+/***********************/
+
+module Module_FSM_Core(clk, ss, lr, state, reset);
+/*
+Implements the stopwatch FSM.
+*/
+input		clk;
+input		ss;
+input		lr;
+
+output reg	[2:0]	state;
+output reg			reset;
+
+reg			ssOld;
+reg			lrOld;
+
+always @(posedge clk) 
+begin
+	lrOld <= lr;
+	ssOld <= ss;
+
+	if (ss && !ssOld)
+	begin
+		case(state)
+			3'b000:
+			begin
+				state <= 3'b010;
+				reset <= 1'b0;
+			end
+			3'b001:
+			begin
+				state <= 3'b010;
+				reset <= 1'b0;
+			end
+			3'b010:
+			begin
+				state <= 3'b001;
+				reset <= 1'b0;
+			end
+			3'b011:
+			begin
+				state <= 3'b100;
+				reset <= 1'b0;
+			end
+			3'b100:
+			begin
+				state <= 3'b011;
+				reset <= 1'b0;
+			end
+		endcase
+	end	else if (lr && !lrOld) begin
+		case(state)
+			3'b000:
+			begin
+				state <= 3'b000;
+				reset <= 1'b0;
+			end
+			3'b001:
+			begin
+				state <= 3'b000;
+				reset <= 1'b1;
+			end
+			3'b010:
+			begin
+				state <= 3'b011;
+				reset <= 1'b0;
+			end
+			3'b011:
+			begin
+				state <= 3'b010;
+				reset <= 1'b0;
+			end
+			3'b100:
+			begin
+				state <= 3'b001;
+				reset <= 1'b0;
+			end
+		endcase
+	end
+end
+endmodule
+
+/*************************/
+/*** Module_StateToLED ***/
+/*************************/
+
+module Module_StateToLED(clk,state,LED);
+/*
+Translates the FSM states in LED configurations
+*/
+input            clk;
+input    [2:0]   state;
+
+output reg [7:0]    LED;
+
+always@(posedge clk)
+    begin
+        case(state)
+            3'b000:
+				LED <= 8'b00000001;
+			3'b001:
+				LED <= 8'b00000010;
+			3'b010:
+				LED <= 8'b01000100;
+			3'b011:
+				LED <= 8'b11001000;
+			3'b100:
+				LED <= 8'b10010000;
+        endcase
+    end
 endmodule
 
 /***********************************/

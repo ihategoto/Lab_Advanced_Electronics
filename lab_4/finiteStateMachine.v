@@ -49,7 +49,7 @@ Module_MonostableMultivibrator button_lr(
 	.flag(w_btn_lr)
 );
 
-FSM_Core fsm(
+Module_FSM_Core fsm(
 	.clk(CLK_125M),
 	.ss(w_btn_ss),
 	.lr(w_btn_lr),
