@@ -1,6 +1,10 @@
 `define		period_1_kHz	30'd62500
 `define	halfPeriod_100_Hz	30'd625000
 
+/*
+Implements a FSM driven stopwatch showing BCD-encoded digits using board LEDs as display.
+*/
+
 module finiteStateMachine(CLK_125M, PUSH_BTN_SS, PUSH_BTN_LR, SW, LED);
 
 input		CLK_125M;
