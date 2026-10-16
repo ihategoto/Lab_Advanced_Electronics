@@ -1,3 +1,6 @@
+`define		period_1_kHz	30'd62500
+`define	halfPeriod_100_Hz	30'd625000
+
 module startStopLapResetChrono_OLED	(
 	CLK_125M,
 	SW,

@@ -212,8 +212,10 @@ reg [29:0] counter;
 always @(posedge clk)
 begin
     if (old_button == 0 && button == 1 && counter == 0)
+	begin
             flag <= ~flag;
             counter <= 1;
+	end
     else if (counter == duration)
             counter <= 0;
     else if (counter > 0) // maybe here is better to have an if instead of an else if
