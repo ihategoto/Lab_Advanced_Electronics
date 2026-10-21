@@ -1,0 +1,7 @@
+NYQUIST FREQUENCY [Hz], DELAY [s], AMPLIFICATION, SW, CH
+9999.67, half a Nyquist period on average, 0.98, 0, 1
+1233.99, half a Nyquist period on average, 1, 1, 1
+
+9999.67, half a Nyquist period on average, 1.02, 0, 2
+1233.99, half a Nyquist period on average, 1.02, 1, 2
+
