@@ -76,6 +76,7 @@ Module_FSM_Core fsm(
 	.reset(w_reset)
 );
 
+// Cents counter
 Module_SyncCounter_State_8_bit counter_100_Hz(
 	.master_clk(CLK_125M),
 	.clk_in(w_clock_100_Hz),
@@ -86,6 +87,7 @@ Module_SyncCounter_State_8_bit counter_100_Hz(
 	.carry(w_carry_10_Hz)
 );
 
+// Tens of cents counter
 Module_SyncCounter_State_8_bit counter_10_Hz(
 	.master_clk(CLK_125M),
 	.clk_in(w_carry_10_Hz),
@@ -96,6 +98,7 @@ Module_SyncCounter_State_8_bit counter_10_Hz(
 	.carry(w_carry_1_Hz)
 );
 
+// Secs counter
 Module_SyncCounter_State_8_bit counter_1_Hz(
 	.master_clk(CLK_125M),
 	.clk_in(w_carry_1_Hz),
@@ -106,6 +109,7 @@ Module_SyncCounter_State_8_bit counter_1_Hz(
 	.carry(w_carry_100_mHz)
 );
 
+// Tens of secs counter
 Module_SyncCounter_State_8_bit counter_100_mHz(
 	.master_clk(CLK_125M),
 	.clk_in(w_carry_100_mHz),
@@ -115,6 +119,7 @@ Module_SyncCounter_State_8_bit counter_100_mHz(
 	.out(wb_counter[15:12])
 );
 
+// Lap latch
 Module_Latch_16_bit latch(
 	.clk(CLK_125M),
 	.in(wb_counter),
@@ -122,6 +127,7 @@ Module_Latch_16_bit latch(
 	.flag(wb_state == 3'd3 || wb_state == 3'd4)
 );
 
+// OLED driver
 Driver_OLED driver_OLED_instance (
 				.gclk(CLK_125M),
 				.four_digit_input(wb_counter_toShow),
