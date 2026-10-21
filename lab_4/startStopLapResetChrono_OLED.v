@@ -115,7 +115,7 @@ Module_SyncCounter_State_8_bit counter_100_mHz(
 	.out(wb_counter[15:12])
 );
 
-Module_Latch_16_bit(
+Module_Latch_16_bit latch(
 	.clk(CLK_125M),
 	.in(wb_counter),
 	.out(wb_counter_toShow),
