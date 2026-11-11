@@ -1,5 +1,5 @@
-`define		period_1_kHz	30'd62500
-`define	halfPeriod_100_Hz	30'd625000
+`define		period_1_kHz	32'd62500
+`define	halfPeriod_100_Hz	32'd625000
 
 module startStopLapResetChrono_OLED	(
 	CLK_125M,
@@ -46,18 +46,18 @@ wire	[15:0]	wb_counter_toShow;
 
 // stop button
 Module_MonostableMultivibrator button_ss(
-	.clk(CLK_125M),
+	.clk_in(CLK_125M),
 	.duration(`period_1_kHz),
-	.button(PUSH_BTN_SS),
-	.flag(w_btn_ss)
+	.in(PUSH_BTN_SS),
+	.out_state(w_btn_ss)
 );
 
 // lap button
 Module_MonostableMultivibrator button_lr(
-	.clk(CLK_125M),
+	.clk_in(CLK_125M),
 	.duration(`period_1_kHz),
-	.button(PUSH_BTN_LR),
-	.flag(w_btn_lr)
+	.in(PUSH_BTN_LR),
+	.out_state(w_btn_lr)
 );
 
 // 100Hz clock from the master clock
@@ -78,8 +78,8 @@ Module_FSM_Core fsm(
 
 // Cents counter
 Module_SyncCounter_State_8_bit counter_100_Hz(
-	.master_clk(CLK_125M),
-	.clk_in(w_clock_100_Hz),
+	.clk_in(CLK_125M),
+	.clk_count(w_clock_100_Hz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -89,8 +89,8 @@ Module_SyncCounter_State_8_bit counter_100_Hz(
 
 // Tens of cents counter
 Module_SyncCounter_State_8_bit counter_10_Hz(
-	.master_clk(CLK_125M),
-	.clk_in(w_carry_10_Hz),
+	.clk_in(CLK_125M),
+	.clk_count(w_carry_10_Hz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -100,8 +100,8 @@ Module_SyncCounter_State_8_bit counter_10_Hz(
 
 // Secs counter
 Module_SyncCounter_State_8_bit counter_1_Hz(
-	.master_clk(CLK_125M),
-	.clk_in(w_carry_1_Hz),
+	.clk_in(CLK_125M),
+	.clk_count(w_carry_1_Hz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -111,8 +111,8 @@ Module_SyncCounter_State_8_bit counter_1_Hz(
 
 // Tens of secs counter
 Module_SyncCounter_State_8_bit counter_100_mHz(
-	.master_clk(CLK_125M),
-	.clk_in(w_carry_100_mHz),
+	.clk_in(CLK_125M),
+	.clk_count(w_carry_100_mHz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -121,10 +121,10 @@ Module_SyncCounter_State_8_bit counter_100_mHz(
 
 // Lap latch
 Module_Latch_16_bit latch(
-	.clk(CLK_125M),
+	.clk_in(CLK_125M),
 	.in(wb_counter),
 	.out(wb_counter_toShow),
-	.flag(wb_state == 3'd3 || wb_state == 3'd4)
+	.hold(wb_state == 3'd3 || wb_state == 3'd4)
 );
 
 // OLED driver

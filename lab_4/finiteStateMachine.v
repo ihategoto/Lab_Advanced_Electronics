@@ -1,5 +1,5 @@
-`define		period_1_kHz	30'd62500
-`define	halfPeriod_100_Hz	30'd625000
+`define	period_1_kHz	32'd62500
+`define	halfPeriod_100_Hz	32'd625000
 
 /*
 Implements a FSM driven stopwatch showing BCD-encoded digits using board LEDs as display.
@@ -40,21 +40,21 @@ Module_FrequencyDivider clock_100_Hz_generator (
 );
 
 Module_MonostableMultivibrator button_ss(
-	.clk(CLK_125M),
+	.clk_in(CLK_125M),
 	.duration(`period_1_kHz),
-	.button(PUSH_BTN_SS),
-	.flag(w_btn_ss)
+	.in(PUSH_BTN_SS),
+	.out_state(w_btn_ss)
 );
 
 Module_MonostableMultivibrator button_lr(
-	.clk(CLK_125M),
+	.clk_in(CLK_125M),
 	.duration(`period_1_kHz),
-	.button(PUSH_BTN_LR),
-	.flag(w_btn_lr)
+	.in(PUSH_BTN_LR),
+	.out_state(w_btn_lr)
 );
 
-Module_FSM_Core fsm(
-	.clk(CLK_125M),
+Module_FSM_Stopwatch fsm(
+	.clk_in(CLK_125M),
 	.ss(w_btn_ss),
 	.lr(w_btn_lr),
 	.state(wb_state),
@@ -62,8 +62,8 @@ Module_FSM_Core fsm(
 );
 
 Module_SyncCounter_State_8_bit counter_100_Hz(
-	.master_clk(CLK_125M),
-	.clk_in(w_clock_100_Hz),
+	.clk_in(CLK_125M),
+	.clk_count(w_clock_100_Hz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -72,8 +72,8 @@ Module_SyncCounter_State_8_bit counter_100_Hz(
 );
 
 Module_SyncCounter_State_8_bit counter_10_Hz(
-	.master_clk(CLK_125M),
-	.clk_in(w_carry_10_Hz),
+	.clk_in(CLK_125M),
+	.clk_count(w_carry_10_Hz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -82,8 +82,8 @@ Module_SyncCounter_State_8_bit counter_10_Hz(
 );
 
 Module_SyncCounter_State_8_bit counter_1_Hz(
-	.master_clk(CLK_125M),
-	.clk_in(w_carry_1_Hz),
+	.clk_in(CLK_125M),
+	.clk_count(w_carry_1_Hz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -92,8 +92,8 @@ Module_SyncCounter_State_8_bit counter_1_Hz(
 );
 
 Module_SyncCounter_State_8_bit counter_100_mHz(
-	.master_clk(CLK_125M),
-	.clk_in(w_carry_100_mHz),
+	.clk_in(CLK_125M),
+	.clk_count(w_carry_100_mHz),
 	.stop(wb_state != 3'd2 && wb_state != 3'd3),
 	.reset(w_reset),
 	.limit(4'd10),
@@ -102,18 +102,18 @@ Module_SyncCounter_State_8_bit counter_100_mHz(
 
 // output multiplexer addressed by the switch
 Module_Multiplexer_16_8_bit multiplexer (
-	.clk(CLK_125M),
+	.clk_in(CLK_125M),
 	.addr(SW),
-	.input_1(wb_secs),
-	.input_2(wb_cents),
+	.in_1(wb_secs),
+	.in_2(wb_cents),
 	.out(wb_latch)
 );
 
 Module_Latch_8_bit latch(
-	.clk(CLK_125M),
+	.clk_in(CLK_125M),
 	.in(wb_latch),
 	.out(LED),
-	.flag(wb_state == 3'd3 || wb_state == 3'd4)
+	.hold(wb_state == 3'd3 || wb_state == 3'd4)
 );
 
 
