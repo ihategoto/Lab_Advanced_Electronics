@@ -3,18 +3,18 @@
 // 62.5 10^5
 `define defaultHalfPeriod 30'b000000010111110101111000010000
 
-module simpleCounter (
-		CLK_125M,
+module simpleCounter(
+	input CLK_125M,
+	output [7:0] LED
+);
 
-		LED);
+input CLK_125M;
 
-input 		CLK_125M;
-
-output [7:0]	LED;
+output [7:0] LED;
 
 //wire		w_clock_1_Hz;
-wire		w_clock_10_Hz;
-wire		w_carry;
+wire w_clock_10_Hz;
+wire w_carry;
 
 // module_name instance_name
 /*
