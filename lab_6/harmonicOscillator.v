@@ -1,78 +1,77 @@
-`define		boundaryCondition			24'b000110000000000000000000
-`define signed M 16'd4
-`define signed A 16'b0000111111111111
+`define k 4'd4
+`define amplitude 24'b000010100000000000000000
 
-
-module harmonicOscillator	(	CLK_125M,
-					SW,
-					pushButton, brake,
-
-					DAC_SDA1, DAC_SDA2, DAC_CSEL, DAC_SCLK);
-
-output		DAC_SDA1;
-output		DAC_SDA2;
-output		DAC_CSEL;
-output		DAC_SCLK;
-
-input		CLK_125M;
-input		pushButton;
-input		brake;	// also a pushButton
-input	[3:0]	SW;
-
-wire		w_sampling_trigger;
-
-wire		w_clock_unbraked;
-wire		w_clock;
-
-wire	signed [11:0]	wb_V1;
-wire	signed [11:0]	wb_V2;
-
-/************************/
-/*** CLOCK GENERATION ***/
-/************************/
-Module_Counter_32_bit		sampling_trigger_generator	(	.clk_in(CLK_125M),
-									.limit(32'd1250),		// 125 MHz / 1250 = 100 kHz
-
-									.carry(w_sampling_trigger));
-
-Module_Counter_8_bit		oscillatorClockUnbraked	(	.clk_in(w_sampling_trigger),
-								.limit(8'd5),				// 100/5 kHz = 20 kHz
-								.carry(w_clock_unbraked));
-
-/******************/
-/*** DAC DRIVER ***/
-/******************/
-Driver_DAC driver_DAC_instance (
-				.gclk(CLK_125M),
-				.data_ch_1(wb_V1),
-				.data_ch_2(wb_V2),
-				.mode_ch_1({2'b00}),
-				.mode_ch_2({2'b00}),
-				.start_write(w_sampling_trigger),
-				.dac_sda1(DAC_SDA1),
-				.dac_sda2(DAC_SDA2),
-				.dac_csel(DAC_CSEL),
-				.dac_sclk(DAC_SCLK)); //,
-				// .busy(w_busy));
-
-/***************************************/
-/*** ... AND FINALLY, THE OSCILLATOR ***/
-/***************************************/
-/*
-Module_HarmonicOscillator	pendulumInPhase		(.clk_in(w_clock),
-								.k(SW),
-								.loadBoundaryCondition(pushButton),
-								.boundaryCondition(`boundaryCondition),
-								.wave(wb_V1));
-*/
-harmonic_oscillator(
-	.clk(CLK_125M),
-	.interval(w_clock_unbraked),
-	.M(M),
-	.A(A),
-	.y(wb_V1)
+module harmonicOscillator(
+	input			CLK_125M,
+	input	[3:0]	SW,
+	input			pushButton,
+	output			DAC_SDA1,
+	output			DAC_SDA2,
+	output			DAC_CSEL,
+	output			DAC_SCLK
 );
 
-assign wb_V2 = -1 * wb_V1;
+wire w_sampling_trigger;
+wire w_data_ready;
+wire w_sign_change;
+wire w_load_quadrature;
+
+wire signed [11:0] wb_V1;
+wire signed [23:0] wb_V1_undelayed;
+wire signed [23:0] wb_V2;
+
+// 125 MHz / 1250 = 100 kHz sampling frequency
+Module_Posedge_Counter_32_bit sampling_trigger_generator(
+	.clk_in(CLK_125M), 
+	.limit(32'd1250),		
+	.carry(w_sampling_trigger)
+);
+
+Module_HarmonicOscillator_24_bit ho(
+	.clk_in(CLK_125M),
+	.write_clk(w_sampling_trigger),
+	.k(`k),
+	.amplitude(`amplitude),
+	.load(pushButton),
+	.out_sig(wb_V1_undelayed),
+	.data_ready(w_data_ready),
+	.sign_change(w_sign_change)
+);
+
+Module_SR_FlipFlop SR(
+	.clk_in(CLK_125M),
+	.data_in(w_sign_change),
+	.reset(pushButton),
+	.data_out(w_load_quadrature)
+);
+
+Module_HarmonicOscillator_24_bit ho_quad(
+	.clk_in(CLK_125M),
+	.write_clk(w_sampling_trigger),
+	.k(`k),
+	.amplitude(`amplitude),
+	.load(w_load_quadrature),
+	.out_sig(wb_V2)
+);
+
+Module_Delayer_12_bit(
+	.clk_in(CLK_125M),
+	.delay_clk(w_data_ready),
+	.in_sig(wb_V1_undelayed[23:12]),
+	.out_sig(wb_V1)
+);
+
+Driver_DAC driver_DAC_instance(
+	.gclk(CLK_125M),
+	.data_ch_1(wb_V1),
+	.data_ch_2(wb_V2[23:12]),
+	.mode_ch_1({2'b00}),
+	.mode_ch_2({2'b00}),
+	.start_write(w_data_ready),
+	.dac_sda1(DAC_SDA1),
+	.dac_sda2(DAC_SDA2),
+	.dac_csel(DAC_CSEL),
+	.dac_sclk(DAC_SCLK)
+);
 
 endmodule

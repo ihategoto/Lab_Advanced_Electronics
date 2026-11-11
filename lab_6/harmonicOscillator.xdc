@@ -9,4 +9,3 @@ set_property -dict { PACKAGE_PIN T16 IOSTANDARD LVCMOS33 } [get_ports { SW[3] }]
 
 ## Buttons
 set_property -dict { PACKAGE_PIN K18 IOSTANDARD LVCMOS33 } [get_ports { pushButton }];
-set_property -dict { PACKAGE_PIN Y16 IOSTANDARD LVCMOS33 } [get_ports { brake }];
