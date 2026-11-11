@@ -681,7 +681,8 @@ module Module_HarmonicOscillator_12_bit(
 	input [11:0] amplitude, 
 	input load,
 	output reg signed [11:0] out_sig,
-	output reg data_ready	
+	output reg data_ready,
+	output reg sign_change	
 );
 /*
 Implements the sequence 
@@ -695,10 +696,11 @@ write_clk is a secondary clock that times the sequence.
 */
 reg signed [11:0] out_sig_old;
 reg write_clk_old;
+reg load_old;
 
 always @(posedge clk_in)
 begin
-    if (load)
+    if (!load_old && load)
     begin
         out_sig <= amplitude;
         out_sig_old <= amplitude - (amplitude>>>(k+1));
@@ -708,10 +710,12 @@ begin
         out_sig_old <= out_sig;
         out_sig <= (out_sig<<<1) - (out_sig>>>k) - out_sig_old;
 		data_ready <= 1;
+		sign_change <= out_sig_old[11] ^ out_sig[11]; 
 	end
 	else if(data_ready)
 		data_ready <= 0;
     write_clk_old <= write_clk;
+	load_old <= load;
 end
 
 endmodule
@@ -727,7 +731,8 @@ module Module_HarmonicOscillator_24_bit(
 	input [23:0] amplitude, // double the number of bits to avoid overflow
 	input load,
 	output reg signed [23:0] out_sig,
-	output reg data_ready
+	output reg data_ready,
+	output reg sign_change
 );
 /*
 Implements the sequence 
@@ -741,10 +746,11 @@ write_clk is a secondary clock that times the sequence.
 */
 reg signed [23:0] out_sig_old;
 reg write_clk_old;
+reg load_old;
 
 always @(posedge clk_in)
 begin
-    if (load)
+    if (!load_old && load)
     begin
         out_sig <= amplitude;
         out_sig_old <= amplitude - (amplitude>>>(k+1));
@@ -754,10 +760,12 @@ begin
         out_sig_old <= out_sig;
         out_sig <= (out_sig<<<1) - (out_sig>>>k) - out_sig_old;
 		data_ready <= 1;
+		sign_change <= out_sig_old[23] ^ out_sig[23];
 	end
 	else if(data_ready)
 		data_ready <= 0;
     write_clk_old <= write_clk;
+	load_old <= load;
 end
 
 endmodule
@@ -804,6 +812,32 @@ begin
 end
 
 endmodule
+
+/**************************/
+/*** Module_SR_FlipFlop ***/
+/**************************/
+
+module Module_SR_FlipFlop(
+	input clk_in,
+	input data_in,
+	input reset,
+	output reg data_out
+);
+initial data_out = 0;
+
+always @(posedge clk_in)
+begin
+	if(reset)
+		data_out <= 0;
+	else
+		data_out <= data_in | data_out;
+end
+
+endmodule
+
+/**********************************/
+/*** Module_PseudoRandom_12_bit ***/
+/**********************************/
 
 
 module Module_PseudoRandom_12_bit(
