@@ -839,7 +839,6 @@ endmodule
 /*** Module_PseudoRandom_12_bit ***/
 /**********************************/
 
-
 module Module_PseudoRandom_12_bit(
 	input clk_in,
 	input write_clk,
