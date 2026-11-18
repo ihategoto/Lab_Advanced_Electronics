@@ -1,4 +1,3 @@
-`define k 4'd4
 `define amplitude 24'b000010100000000000000000
 
 module harmonicOscillator(
@@ -30,7 +29,7 @@ Module_Posedge_Counter_32_bit sampling_trigger_generator(
 Module_HarmonicOscillator_24_bit ho(
 	.clk_in(CLK_125M),
 	.write_clk(w_sampling_trigger),
-	.k(`k),
+	.k(SW),
 	.amplitude(`amplitude),
 	.load(pushButton),
 	.out_sig(wb_V1_undelayed),
@@ -48,7 +47,7 @@ Module_SR_FlipFlop SR(
 Module_HarmonicOscillator_24_bit ho_quad(
 	.clk_in(CLK_125M),
 	.write_clk(w_sampling_trigger),
-	.k(`k),
+	.k(SW),
 	.amplitude(`amplitude),
 	.load(w_load_quadrature),
 	.out_sig(wb_V2)
